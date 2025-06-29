@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ReduxProvider } from "@/providers/ReduxProvider";
@@ -12,7 +11,7 @@ import HodProtectedRoute from "@/components/HodProtectedRoute";
 import StaffProtectedRoute from "@/components/StaffProtectedRoute";
 import Login from "@/pages/Login";
 import Documents from "@/pages/Documents";
-// import DocumentView from "@/pages/DocumentView";
+import DocumentSharing from "@/pages/DocumentSharing";
 import DepartmentDashboard from "@/pages/DepartmentDashboard";
 import Upload from "@/pages/Upload";
 import Users from "@/pages/Users";
@@ -29,6 +28,9 @@ import SuperAdminDashboard from "@/pages/super-admin/SuperAdminDashboard";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
 import Index from "./pages/Index";
 import RedirectDashboard from "./Dashboard";
+import FormTemplates from "@/pages/FormTemplates";
+import FormCreate from "@/pages/FormCreate";
+import MyForms from "@/pages/MyForms";
 
 function App() {
   console.log("App rendering");
@@ -48,6 +50,20 @@ function App() {
                 <Route index element={<RedirectDashboard />} />
               </Route>
               
+              {/* Digital Forms Routes - Available to all authenticated users */}
+              {/* <Route path="/forms" element={<ProtectedRoute />}>
+                <Route index element={<FormTemplates />} />
+                <Route path="create/:templateId" element={<FormCreate />} />
+                <Route path="my-forms" element={<MyForms />} />
+                <Route path="view/:formId" element={<MyForms />} />
+                <Route path="edit/:formId" element={<FormCreate />} />
+              </Route> */}
+              
+              {/* Document Sharing Routes - Available to all authenticated users */}
+              <Route path="/documents" element={<ProtectedRoute />}>
+                <Route path="sharing" element={<DocumentSharing />} />
+              </Route>
+              
               {/* CMD specific routes - All under /dashboard/cmd */}
               <Route path="/dashboard/cmd" element={<CmdProtectedRoute />}>
                 <Route index element={<CmdDashboard />} />
@@ -62,15 +78,22 @@ function App() {
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
                 <Route path=":departmentSlug" element={<CmdDashboard />} />
+                <Route path="documents/sharing" element={<DocumentSharing />} />
+
+                {/* ✅ Correct: Forms Routes - nested under cmd/forms */}
+                <Route path="forms" element={<FormTemplates />}>
+                  <Route path="create/:templateId" element={<FormCreate />} />
+                  <Route path="my-forms" element={<MyForms />} />
+                  <Route path="view/:formId" element={<MyForms />} />
+                  <Route path="edit/:formId" element={<FormCreate />} />
+                </Route>
               </Route>
               
               {/* HOD specific routes - All under /dashboard/hod */}
               <Route path="/dashboard/hod" element={<HodProtectedRoute />}>
                 <Route index element={<HodDashboard />} />
-                {/* <Route path="department" element={<DepartmentDashboard />} /> */}
                 <Route path="uploads" element={<Upload />} />
                 <Route path="documents" element={<Documents />} />
-                {/* <Route path="approvals" element={<DepartmentDashboard />} /> */}
                 <Route path="staff" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="settings/profiles" element={<Settings />} />
@@ -94,9 +117,7 @@ function App() {
               {/* Super Admin specific routes - All under /dashboard/super-admin */}
               <Route path="/dashboard/super-admin" element={<SuperAdminProtectedRoute />}>
                 <Route index element={<SuperAdminDashboard />} />
-                {/* <Route path="documents" element={<Documents />} /> */}
                 <Route path="systems" element={<SuperAdminDashboard />} />
-                {/* <Route path="uploads" element={<Upload />} /> */}
                 <Route path="reports" element={<SuperAdminDashboard />} />
                 <Route path="users/management" element={<UserManagement />} />
                 <Route path="users/roles" element={<UserManagement />} />
@@ -110,20 +131,13 @@ function App() {
               {/* Staff specific routes - All under /dashboard/staff */}
               <Route path="/dashboard/staff" element={<StaffProtectedRoute />}>
                 <Route index element={<StaffDashboard />} />
-                {/* <Route path="department" element={<DepartmentDashboard />} /> */}
                 <Route path="uploads" element={<Upload />} />
                 <Route path="documents" element={<Documents />} />
-                {/* <Route path="approvals" element={<DepartmentDashboard />} /> */}
                 <Route path="settings" element={<Settings />} />
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
               </Route>
-              
-              {/* Document view routes but commented out: All documents should be within user dashboard */}
-              {/* <Route path="/documents/:id" element={<ProtectedRoute />}>
-                <Route index element={<DocumentView />} />
-              </Route> */}
               
               {/* 404 route */}
               <Route path="*" element={<NotFound />} />

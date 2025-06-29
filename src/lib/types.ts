@@ -43,6 +43,59 @@ export enum DocumentType {
   OTHER = "Other"
 }
 
+// Document Share Status Enum
+export enum ShareStatus {
+  SENT = "Sent",
+  RECEIVED = "Received",
+  SEEN = "Seen",
+  ACKNOWLEDGED = "Acknowledged"
+}
+
+// Document Share Interface
+export interface DocumentShare {
+  id: string;
+  documentId: string;
+  fromUserId: string;
+  toUserId?: string;
+  toDepartment?: Department;
+  status: ShareStatus;
+  message?: string;
+  sharedAt: Date;
+  receivedAt?: Date;
+  seenAt?: Date;
+  acknowledgedAt?: Date;
+}
+
+// Document Version Interface
+export interface DocumentVersion {
+  id: string;
+  documentId: string;
+  version: number;
+  name: string;
+  content: any; // JSON content for digital forms or file data for uploaded docs
+  modifiedBy: string; // User ID
+  modifiedAt: Date;
+  changeDescription?: string;
+  fileUrl?: string; // For uploaded documents
+  fileSize?: number;
+}
+
+// Digital Signature Interface
+export interface DigitalSignature {
+  id: string;
+  documentId: string;
+  signerId: string; // User ID of the signer
+  signerName: string;
+  signerRole: UserRole;
+  signatureData: string; // Base64 encoded signature image or hash
+  signedAt: Date;
+  ipAddress?: string;
+  userAgent?: string;
+  signatureType: 'approval' | 'rejection' | 'acknowledgment';
+  comments?: string;
+  isValid: boolean; // For signature verification
+}
+
 // User Interface
 export interface User {
   id: string;
@@ -64,9 +117,9 @@ export interface Document {
   uploadedAt: Date;
   modifiedAt: Date;
   status: DocumentStatus;
-  fileUrl: string;
-  fileSize: number; // in bytes
-  fileType: string; // MIME type
+  fileUrl?: string; // Optional for digital forms
+  fileSize?: number; // in bytes
+  fileType?: string; // MIME type
   description?: string;
   tags?: string[];
   priority?: 'low' | 'medium' | 'high' | 'urgent';
@@ -75,6 +128,14 @@ export interface Document {
   approvalChain?: string[]; // Ordered list of user IDs in approval chain
   version: number;
   comments?: Comment[];
+  shares?: DocumentShare[]; // Track document shares
+  versions?: DocumentVersion[]; // Document version history
+  isDigitalForm?: boolean; // Whether this is a digital form or uploaded file
+  formData?: any; // JSON data for digital forms
+  templateId?: string; // Reference to form template if created from template
+  signatures?: DigitalSignature[]; // Digital signatures
+  isLocked?: boolean; // Whether document is locked after signing
+  requiresSignature?: boolean; // Whether document requires digital signature
 }
 
 // Comment Interface
@@ -91,7 +152,7 @@ export interface AuditLog {
   id: string;
   documentId: string;
   userId: string;
-  action: 'create' | 'view' | 'update' | 'delete' | 'download' | 'approve' | 'reject';
+  action: 'create' | 'view' | 'update' | 'delete' | 'download' | 'approve' | 'reject' | 'share';
   timestamp: Date;
   details?: string;
 }
