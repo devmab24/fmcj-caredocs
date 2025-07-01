@@ -145,6 +145,7 @@ function App() {
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
                 <Route path="inbox" element={<StaffInbox />} />
+                <Route path="approvals" element={<DepartmentDashboard />} />
 
                 {/* Forms Routes */}
                 <Route path="forms" element={<FormTemplates />} />
