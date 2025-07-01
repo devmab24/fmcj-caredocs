@@ -36,6 +36,7 @@ import MyForms from "@/pages/MyForms";
 import StaffDocumentCommunications from "@/pages/staff/StaffDocumentCommunications";
 import CmdDepartmentsList from "./components/CmdDepartmentsList";
 import HODInbox from "./pages/hod/HODInbox";
+import StaffInbox from "./pages/staff/StaffInbox";
 
 function App() {
   console.log("App rendering");
@@ -143,6 +144,14 @@ function App() {
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
+                <Route path="inbox" element={<StaffInbox />} />
+
+                {/* Forms Routes */}
+                <Route path="forms" element={<FormTemplates />} />
+                <Route path="forms/create/:templateId" element={<FormCreate />} />
+                <Route path="forms/my-forms" element={<MyForms />} />
+                <Route path="forms/view/:formId" element={<MyForms />} />
+                <Route path="forms/edit/:formId" element={<FormCreate />} />
               </Route>
               
               {/* 404 route */}
