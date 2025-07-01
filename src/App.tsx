@@ -35,6 +35,7 @@ import FormCreate from "@/pages/FormCreate";
 import MyForms from "@/pages/MyForms";
 import StaffDocumentCommunications from "@/pages/staff/StaffDocumentCommunications";
 import CmdDepartmentsList from "./components/CmdDepartmentsList";
+import HODInbox from "./pages/hod/HODInbox";
 
 function App() {
   console.log("App rendering");
@@ -90,12 +91,19 @@ function App() {
                 <Route path="uploads" element={<Upload />} />
                 <Route path="documents" element={<Documents />} />
                 <Route path="submissions" element={<HodDocumentSubmissions />} />
-                <Route path="communications" element={<HodDocumentSubmissions />} />
                 <Route path="staff" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
+                <Route path="inbox" element={<HODInbox />} />
+
+                {/* Forms Routes */}
+                <Route path="forms" element={<FormTemplates />} />
+                <Route path="forms/create/:templateId" element={<FormCreate />} />
+                <Route path="forms/my-forms" element={<MyForms />} />
+                <Route path="forms/view/:formId" element={<MyForms />} />
+                <Route path="forms/edit/:formId" element={<FormCreate />} />
               </Route>
               
               {/* Admin specific routes - All under /dashboard/admin */}
