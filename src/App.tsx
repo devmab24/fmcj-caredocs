@@ -34,6 +34,7 @@ import FormTemplates from "@/pages/FormTemplates";
 import FormCreate from "@/pages/FormCreate";
 import MyForms from "@/pages/MyForms";
 import StaffDocumentCommunications from "@/pages/staff/StaffDocumentCommunications";
+import CmdDepartmentsList from "./components/CmdDepartmentsList";
 
 function App() {
   console.log("App rendering");
@@ -61,7 +62,7 @@ function App() {
               {/* CMD specific routes - All under /dashboard/cmd */}
               <Route path="/dashboard/cmd" element={<CmdProtectedRoute />}>
                 <Route index element={<CmdDashboard />} />
-                <Route path="departments" element={<CmdDashboard />} />
+                <Route path="departments" element={<CmdDepartmentsList />} />
                 <Route path="uploads" element={<CmdUpload />} />
                 <Route path="documents" element={<CmdDocuments />} />
                 <Route path="inbox" element={<CmdInbox />} />
@@ -72,7 +73,7 @@ function App() {
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
-                <Route path=":departmentSlug" element={<CmdDashboard />} />
+                <Route path=":departmentSlug" element={<CmdDepartmentsList />} />
                 <Route path="documents/sharing" element={<DocumentSharing />} />
 
                 {/* Forms Routes */}
