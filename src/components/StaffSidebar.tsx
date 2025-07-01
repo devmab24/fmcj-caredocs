@@ -2,7 +2,7 @@
 import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, File, Upload, Settings, 
-  FileText, FolderHeart, FormInput
+  FileText, FolderHeart, FormInput, Inbox
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,8 +22,8 @@ const StaffSidebar = () => {
 
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "bg-sidebar-accent text-primary font-medium w-full flex items-center gap-2 p-2 rounded-md"
-      : "hover:bg-sidebar-accent/50 w-full flex items-center gap-2 p-2 rounded-md transition-colors";
+      ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold w-full flex items-center gap-2 p-2 rounded-md"
+      : "hover:bg-primary/5 hover:text-primary text-muted-foreground w-full flex items-center gap-2 p-2 rounded-md transition-colors";
 
   return (
     <Sidebar
@@ -52,6 +52,15 @@ const StaffSidebar = () => {
                   <NavLink to="/forms" className={getNavClass}>
                     <FormInput className="h-5 w-5" />
                     {!collapsed && <span>Digital Forms</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/inbox" className={getNavClass}>
+                    <Inbox className="h-5 w-5" />
+                    {!collapsed && <span>Inbox</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

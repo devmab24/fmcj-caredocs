@@ -1,8 +1,8 @@
-
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { 
-  LayoutDashboard, File, Upload, Settings, ShieldCheck, 
-  FileText, Users, Activity, FolderHeart, FileSearch, UserRound, Stethoscope, FilePlus, Share2
+  LayoutDashboard, File, Upload, Settings, Users, 
+  FileText, FolderHeart, FormInput, Share,
+  Activity, FileSearch, UserRound, Stethoscope
 } from "lucide-react";
 import {
   Sidebar,
@@ -15,47 +15,47 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Department } from "@/lib/types";
+import { Department } from "@/lib/types"; 
+import { clsx } from "clsx";
+
 
 const CmdSidebar = () => {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
-  const currentPath = location.pathname;
 
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "bg-sidebar-accent text-primary font-medium w-full flex items-center gap-2 p-2 rounded-md"
-      : "hover:bg-sidebar-accent/50 w-full flex items-center gap-2 p-2 rounded-md transition-colors";
-
+        ? "bg-sidebar-accent text-primary border-r-2 border-primary font-medium w-full flex items-center gap-2 p-2 rounded-md"
+        : "hover:bg-sidebar-accent/50 w-full flex items-center gap-2 p-2 rounded-md transition-colors";
+        
   const getDepartmentIcon = (department: Department) => {
-    switch (department) {
-      case Department.RADIOLOGY: return <Activity className="h-5 w-5" />;
-      case Department.DENTAL: return <FolderHeart className="h-5 w-5" />;
-      case Department.EYE_CLINIC: return <FileSearch className="h-5 w-5" />;
-      case Department.ANTENATAL: return <UserRound className="h-5 w-5" />;
-      case Department.A_AND_E: return <Activity className="h-5 w-5" />;
-      case Department.PHYSIOTHERAPY: return <Stethoscope className="h-5 w-5" />;
-      default: return <FolderHeart className="h-5 w-5" />;
-    }
-  };
-
-  const formatDepartmentName = (department: Department) => {
-    return department
-      .replace(/_/g, ' ')
-      .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
-  };
-
-  const getDepartmentSlug = (department: Department) => {
-    return department.toLowerCase().replace(/_/g, '-');
-  };
-
+      switch (department) {
+        case Department.RADIOLOGY: return <Activity className="h-5 w-5" />;
+        case Department.DENTAL: return <FolderHeart className="h-5 w-5" />;
+        case Department.EYE_CLINIC: return <FileSearch className="h-5 w-5" />;
+        case Department.ANTENATAL: return <UserRound className="h-5 w-5" />;
+        case Department.A_AND_E: return <Activity className="h-5 w-5" />;
+        case Department.PHYSIOTHERAPY: return <Stethoscope className="h-5 w-5" />;
+        default: return <FolderHeart className="h-5 w-5" />;
+      }
+    };
+  
+    const formatDepartmentName = (department: Department) => {
+      return department
+        .replace(/_/g, ' ')
+        .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+    };
+  
+    const getDepartmentSlug = (department: Department) => {
+      return department.toLowerCase().replace(/_/g, '-');
+    };
+     
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-64"}  pt-12 border-r border-border transition-all duration-300 ease-in-out`}
+      className={`${collapsed ? "w-16" : "w-64"} pt-12 border-r border-border transition-all duration-300 ease-in-out`}
       collapsible="icon"
     >
-      <SidebarContent className="p-3  pt-3">
+      <SidebarContent className="p-3"> 
         {/* CMD Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
@@ -66,8 +66,17 @@ const CmdSidebar = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/cmd" className={getNavClass}>
-                    <ShieldCheck className="h-5 w-5" />
-                    {!collapsed && <span>CMD Overview</span>}
+                    <LayoutDashboard className="h-5 w-5" />
+                    {!collapsed && <span>Dashboard</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/dashboard/cmd/forms" className={getNavClass}>
+                    <FormInput className="h-5 w-5" />
+                    {!collapsed && <span>Digital Forms</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -75,26 +84,26 @@ const CmdSidebar = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/cmd/documents" className={getNavClass}>
-                    <FileText className="h-5 w-5" />
-                    {!collapsed && <span>All Documents</span>}
+                    <File className="h-5 w-5" />
+                    {!collapsed && <span>Documents View</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-
+              
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/dashboard/cmd/forms" className={getNavClass}>
-                    <FilePlus className="h-5 w-5" />
-                    {!collapsed && <span>Create Documents</span>}
+                  <NavLink to="/dashboard/cmd/inbox" className={getNavClass}>
+                    <FileText className="h-5 w-5" />
+                    {!collapsed && <span>Inbox</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-
+              
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/cmd/documents/sharing" className={getNavClass}>
-                    <Share2 className="h-5 w-5" />
-                    {!collapsed && <span>Send Documents</span>}
+                    <Share className="h-5 w-5" />
+                    {!collapsed && <span>Document Sharing</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -103,16 +112,16 @@ const CmdSidebar = () => {
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/cmd/uploads" className={getNavClass}>
                     <Upload className="h-5 w-5" />
-                    {!collapsed && <span>Upload Document</span>}
+                    {!collapsed && <span>Upload File</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-
+              
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/dashboard/cmd/staff" className={getNavClass}>
+                  <NavLink to="/dashboard/cmd/staff-lists" className={getNavClass}>
                     <Users className="h-5 w-5" />
-                    {!collapsed && <span>All Staffs</span>}
+                    {!collapsed && <span>Staffs</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -120,7 +129,7 @@ const CmdSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* All Departments - CMD can access all */}
+         {/* All Departments - CMD can access all */}
         <SidebarGroup>
           <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
             All Departments
@@ -144,7 +153,7 @@ const CmdSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Settings */}
+         {/* Settings */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
