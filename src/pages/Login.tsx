@@ -56,9 +56,9 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-hospital-100 to-hospital-200 p-4">
-      <div className="w-full max-w-6xl grid grid-cols-1">
+      <div className="w-full max-w-6xl grid grid-cols-1 gap-6">
         {/* Login Form */}
-        <Card className="w-full">
+        <Card className="w-4xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Sign in</CardTitle>
             <CardDescription className="text-center">
