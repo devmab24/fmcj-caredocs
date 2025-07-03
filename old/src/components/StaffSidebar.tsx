@@ -2,7 +2,8 @@
 import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, File, Upload, Settings, 
-  FileText, FolderHeart, FormInput
+  FileText, FolderHeart, FormInput, Inbox,
+  Share
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,8 +23,8 @@ const StaffSidebar = () => {
 
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "bg-sidebar-accent text-primary font-medium w-full flex items-center gap-2 p-2 rounded-md"
-      : "hover:bg-sidebar-accent/50 w-full flex items-center gap-2 p-2 rounded-md transition-colors";
+      ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold w-full flex items-center gap-2 p-2 rounded-md"
+      : "hover:bg-primary/5 hover:text-primary text-muted-foreground w-full flex items-center gap-2 p-2 rounded-md transition-colors";
 
   return (
     <Sidebar
@@ -49,7 +50,7 @@ const StaffSidebar = () => {
               
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/forms" className={getNavClass}>
+                  <NavLink to="/dashboard/staff/forms" className={getNavClass}>
                     <FormInput className="h-5 w-5" />
                     {!collapsed && <span>Digital Forms</span>}
                   </NavLink>
@@ -58,9 +59,18 @@ const StaffSidebar = () => {
               
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
+                  <NavLink to="/dashboard/staff/inbox" className={getNavClass}>
+                    <Inbox className="h-5 w-5" />
+                    {!collapsed && <span>Inbox</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/staff/uploads" className={getNavClass}>
                     <Upload className="h-5 w-5" />
-                    {!collapsed && <span>Uploads</span>}
+                    {!collapsed && <span>File Upload</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -69,7 +79,16 @@ const StaffSidebar = () => {
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/staff/documents" className={getNavClass}>
                     <File className="h-5 w-5" />
-                    {!collapsed && <span>Documents</span>}
+                    {!collapsed && <span>All Documents</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+               <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/dashboard/staff/communications" className={getNavClass}>
+                    <Share className="h-5 w-5" />
+                    {!collapsed && <span>Send Document</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

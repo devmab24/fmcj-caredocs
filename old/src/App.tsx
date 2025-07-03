@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ReduxProvider } from "@/providers/ReduxProvider";
@@ -22,9 +21,11 @@ import NotFound from "@/pages/NotFound";
 import CmdDashboard from "@/pages/CmdDashboard";
 import CmdUpload from "@/pages/cmd/CmdUpload";
 import CmdDocuments from "@/pages/cmd/CmdDocuments";
+import CmdInbox from "@/pages/cmd/CmdInbox";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import UserManagement from "@/pages/admin/UserManagement";
 import HodDashboard from "@/pages/hod/HodDashboard";
+import HodDocumentSubmissions from "@/pages/hod/HodDocumentSubmissions";
 import SuperAdminDashboard from "@/pages/super-admin/SuperAdminDashboard";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
 import Index from "./pages/Index";
@@ -32,7 +33,10 @@ import RedirectDashboard from "./Dashboard";
 import FormTemplates from "@/pages/FormTemplates";
 import FormCreate from "@/pages/FormCreate";
 import MyForms from "@/pages/MyForms";
-import CmdInbox from "./pages/cmd/CmdInbox";
+import StaffDocumentCommunications from "@/pages/staff/StaffDocumentCommunications";
+import CmdDepartmentsList from "./components/CmdDepartmentsList";
+import HODInbox from "./pages/hod/HODInbox";
+import StaffInbox from "./pages/staff/StaffInbox";
 
 function App() {
   console.log("App rendering");
@@ -60,21 +64,21 @@ function App() {
               {/* CMD specific routes - All under /dashboard/cmd */}
               <Route path="/dashboard/cmd" element={<CmdProtectedRoute />}>
                 <Route index element={<CmdDashboard />} />
-                <Route path="departments" element={<CmdDashboard />} />
+                <Route path="departments" element={<CmdDepartmentsList />} />
                 <Route path="uploads" element={<CmdUpload />} />
                 <Route path="documents" element={<CmdDocuments />} />
+                <Route path="inbox" element={<CmdInbox />} />
                 <Route path="approvals" element={<CmdDashboard />} />
                 <Route path="audits" element={<AuditLogs />} />
                 <Route path="settings" element={<Settings />} />
-                <Route path="staff" element={<Users />} />
+                <Route path="staff-lists" element={<Users />} />
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
-                <Route path=":departmentSlug" element={<CmdDashboard />} />
-                <Route path="documents/sharing" element={<DocumentSharing />} /> 
-                <Route path="inbox" element={<CmdInbox />} />
+                <Route path=":departmentSlug" element={<CmdDepartmentsList />} />
+                <Route path="documents/sharing" element={<DocumentSharing />} />
 
-                {/* ✅ Fixed: Forms Routes - proper nesting */}
+                {/* Forms Routes */}
                 <Route path="forms" element={<FormTemplates />} />
                 <Route path="forms/create/:templateId" element={<FormCreate />} />
                 <Route path="forms/my-forms" element={<MyForms />} />
@@ -87,11 +91,20 @@ function App() {
                 <Route index element={<HodDashboard />} />
                 <Route path="uploads" element={<Upload />} />
                 <Route path="documents" element={<Documents />} />
+                <Route path="submissions" element={<HodDocumentSubmissions />} />
                 <Route path="staff" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
+                <Route path="inbox" element={<HODInbox />} />
+
+                {/* Forms Routes */}
+                <Route path="forms" element={<FormTemplates />} />
+                <Route path="forms/create/:templateId" element={<FormCreate />} />
+                <Route path="forms/my-forms" element={<MyForms />} />
+                <Route path="forms/view/:formId" element={<MyForms />} />
+                <Route path="forms/edit/:formId" element={<FormCreate />} />
               </Route>
               
               {/* Admin specific routes - All under /dashboard/admin */}
@@ -126,10 +139,20 @@ function App() {
                 <Route index element={<StaffDashboard />} />
                 <Route path="uploads" element={<Upload />} />
                 <Route path="documents" element={<Documents />} />
+                <Route path="communications" element={<StaffDocumentCommunications />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="settings/profiles" element={<Settings />} />
                 <Route path="settings/notifications" element={<Settings />} />
                 <Route path="settings/accounts" element={<Settings />} />
+                <Route path="inbox" element={<StaffInbox />} />
+                <Route path="approvals" element={<DepartmentDashboard />} />
+
+                {/* Forms Routes */}
+                <Route path="forms" element={<FormTemplates />} />
+                <Route path="forms/create/:templateId" element={<FormCreate />} />
+                <Route path="forms/my-forms" element={<MyForms />} />
+                <Route path="forms/view/:formId" element={<MyForms />} />
+                <Route path="forms/edit/:formId" element={<FormCreate />} />
               </Route>
               
               {/* 404 route */}

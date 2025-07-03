@@ -1,30 +1,34 @@
 
 import { configureStore } from '@reduxjs/toolkit';
-import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
-import documentReducer from './slices/documentSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import type { TypedUseSelectorHook } from 'react-redux';
+
+// Import all slices
 import authReducer from './slices/authSlice';
+import documentReducer from './slices/documentSlice';
+import documentSharingReducer from './slices/documentSharingSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import usersReducer from './slices/usersSlice';
 
 export const store = configureStore({
   reducer: {
-    documents: documentReducer,
     auth: authReducer,
-    dashboard: dashboardReducer
+    documents: documentReducer,
+    documentSharing: documentSharingReducer,
+    dashboard: dashboardReducer,
+    users: usersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-        ignoredPaths: ['auth.user.uploadedAt', 'auth.user.modifiedAt']
-      }
-    })
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-// Typed hooks
-export const useAppDispatch = () => useDispatch<AppDispatch>();
+// Use throughout your app instead of plain `useDispatch` and `useSelector`
+export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
-export default store;

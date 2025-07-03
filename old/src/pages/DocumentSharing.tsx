@@ -1,18 +1,18 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { DocumentShareDialog } from '@/components/DocumentShareDialog';
-import { DocumentSendDialog } from '@/components/DocumentSendDialog';
+import { CmdDocumentSendDialog } from '@/components/CmdDocumentSendDialog';
 import { SharedDocumentsView } from '@/components/SharedDocumentsView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { fetchDocuments, shareDocument, updateShareStatus } from '@/store/slices/documentSlice';
 import { ShareStatus, Document, DocumentShare, User, UserRole, Department } from '@/lib/types';
-import { FileText, Share, Send, Eye, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { FileText, Share, Send, Eye, Download, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { convertMockDocumentToDocument } from '@/lib/utils/documentConverter';
 
 interface SentDocument {
   id: string;
@@ -23,13 +23,17 @@ interface SentDocument {
   sentAt: string;
   message?: string;
   fileName?: string;
+  selectedDocumentId?: string;
 }
 
 const DocumentSharing = () => {
   const { user } = useAuth();
   const dispatch = useAppDispatch();
-  const { documents, shares, loading, shareLoading } = useAppSelector(state => state.documents);
+  const { documents: rawDocuments, shares, loading, shareLoading } = useAppSelector(state => state.documents);
   const [sentDocuments, setSentDocuments] = useState<SentDocument[]>([]);
+
+  // Convert MockDocument[] to Document[]
+  const documents = rawDocuments.map(convertMockDocumentToDocument);
 
   // Mock users for demonstration
   const mockUsers: User[] = [
@@ -90,6 +94,7 @@ const DocumentSharing = () => {
     department: Department;
     message?: string;
     file?: File;
+    selectedDocumentId?: string;
   }) => {
     // Simulate sending document
     const newSentDoc: SentDocument = {
@@ -100,7 +105,8 @@ const DocumentSharing = () => {
       status: 'sent',
       sentAt: new Date().toISOString(),
       message: data.message,
-      fileName: data.file?.name
+      fileName: data.file?.name,
+      selectedDocumentId: data.selectedDocumentId
     };
 
     setSentDocuments(prev => [newSentDoc, ...prev]);
@@ -160,7 +166,7 @@ const DocumentSharing = () => {
                   <Send className="h-5 w-5" />
                   Document Sending
                 </CardTitle>
-                <DocumentSendDialog onSend={handleSendDocument} />
+                <CmdDocumentSendDialog onSend={handleSendDocument} />
               </div>
             </CardHeader>
             <CardContent>
@@ -188,6 +194,7 @@ const DocumentSharing = () => {
                             <p><strong>Sent:</strong> {format(new Date(doc.sentAt), 'MMM d, yyyy at h:mm a')}</p>
                             {doc.message && <p><strong>Message:</strong> {doc.message}</p>}
                             {doc.fileName && <p><strong>File:</strong> {doc.fileName}</p>}
+                            {doc.selectedDocumentId && <p><strong>Source:</strong> Selected from My Forms</p>}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">

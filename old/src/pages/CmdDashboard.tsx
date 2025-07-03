@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,13 +12,17 @@ import { Badge } from "@/components/ui/badge";
 import RecentDocumentsTable from "@/components/RecentDocumentsTable";
 import DepartmentCharts from "@/components/DepartmentCharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { convertMockDocumentToDocument } from "@/lib/utils/documentConverter";
 
 const CmdDashboard = () => {
   const { departmentSlug } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { stats, loading, loadStats, selectDepartment } = useDashboard();
-  const { documents, loadDocuments } = useDocuments();
+  const { documents: rawDocuments, loadDocuments } = useDocuments();
+  
+  // Convert MockDocument[] to Document[]
+  const documents = rawDocuments.map(convertMockDocumentToDocument);
   
   // Check if user has CMD access
   useEffect(() => {
@@ -193,7 +196,7 @@ const CmdDashboard = () => {
       </div>
       
       {/* Charts section */}
-      <DepartmentCharts /> 
+      <DepartmentCharts />
       
       {/* Departments Overview - Only shown when viewing all departments */}
       {!departmentSlug && (

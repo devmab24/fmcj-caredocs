@@ -27,13 +27,16 @@ const DepartmentCharts = () => {
   const isCmd = user?.role === UserRole.CMD;
   const isHod = user?.role === UserRole.HOD;
 
+  // Only show charts for CMD or HOD
+  if (!isCmd && !isHod) {
+    return null;
+  }
+
   // Prepare department data for CMD view (all departments)
   // Or HOD view (only their department)
-  const departmentsToShow = useMemo(() => {
-    return isCmd 
-      ? Object.values(Department) 
-      : user?.department ? [user.department] : [];
-  }, [isCmd, user?.department]);
+  const departmentsToShow = isCmd 
+    ? Object.values(Department) 
+    : user?.department ? [user.department] : [];
 
   // Calculate data for status distribution chart (by department)
   const statusDistribution = useMemo(() => {
@@ -80,16 +83,12 @@ const DepartmentCharts = () => {
     return name;
   };
 
-  // Only show charts for CMD or HOD
-  if (!isCmd && !isHod) {
-    return null;
-  }
-
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold tracking-tight mb-4">Department Analytics</h2>
 
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+        {/* Document Status by Department */}
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Document Status Distribution</CardTitle>

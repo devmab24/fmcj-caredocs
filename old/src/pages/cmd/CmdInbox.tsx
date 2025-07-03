@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { CmdReviewDialog } from '@/components/CmdReviewDialog';
 import { DocumentSubmission, DocumentSharingService } from '@/services/documentSharingService';
-import { Search, Clock, CheckCircle, XCircle, MessageSquare, FileText, Inbox } from 'lucide-react';
+import { Search, Clock, CheckCircle, XCircle, MessageSquare, FileText, Inbox, Share } from 'lucide-react';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 const CmdInbox = () => {
   const [submissions, setSubmissions] = useState<DocumentSubmission[]>([]);
@@ -208,6 +209,18 @@ const CmdInbox = () => {
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+      
+      {/* Document Share Link */}
+      <Card>
+        <CardContent className="space-y-3">
+          <Button asChild variant="outline" className="w-full bg-blue-600 hover:bg-blue-700 hover:text-white">
+            <Link to="/dashboard/cmd/documents/sharing" className='text-white'>
+              <Share className="h-4 w-4 mr-2" />
+              Document Sharing
+            </Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

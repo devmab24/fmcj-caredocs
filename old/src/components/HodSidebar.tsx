@@ -2,7 +2,8 @@
 import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, File, Upload, Settings, Users, 
-  FileText, FolderHeart, FormInput
+  FileText, FolderHeart, FormInput, Inbox,
+  Share
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,8 +23,8 @@ const HodSidebar = () => {
 
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "bg-sidebar-accent text-primary font-medium w-full flex items-center gap-2 p-2 rounded-md"
-      : "hover:bg-sidebar-accent/50 w-full flex items-center gap-2 p-2 rounded-md transition-colors";
+      ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold w-full flex items-center gap-2 p-2 rounded-md"
+      : "hover:bg-primary/5 hover:text-primary text-muted-foreground w-full flex items-center gap-2 p-2 rounded-md transition-colors";
 
   return (
     <Sidebar
@@ -49,7 +50,7 @@ const HodSidebar = () => {
               
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/forms" className={getNavClass}>
+                  <NavLink to="/dashboard/hod/forms" className={getNavClass}>
                     <FormInput className="h-5 w-5" />
                     {!collapsed && <span>Digital Forms</span>}
                   </NavLink>
@@ -58,9 +59,27 @@ const HodSidebar = () => {
               
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
+                  <NavLink to="/dashboard/hod/inbox" className={getNavClass}>
+                    <Inbox className="h-5 w-5" />
+                    {!collapsed && <span>Inbox</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/dashboard/hod/submissions" className={getNavClass}>
+                    <Share className="h-5 w-5" />
+                    {!collapsed && <span>Document Sharing</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/hod/uploads" className={getNavClass}>
                     <Upload className="h-5 w-5" />
-                    {!collapsed && <span>Uploads</span>}
+                    {!collapsed && <span>Document Uploads</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -69,7 +88,7 @@ const HodSidebar = () => {
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/hod/documents" className={getNavClass}>
                     <File className="h-5 w-5" />
-                    {!collapsed && <span>Documents</span>}
+                    {!collapsed && <span>All Documents</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -78,7 +97,7 @@ const HodSidebar = () => {
                 <SidebarMenuButton asChild>
                   <NavLink to="/dashboard/hod/staff" className={getNavClass}>
                     <Users className="h-5 w-5" />
-                    {!collapsed && <span>Staff</span>}
+                    {!collapsed && <span>Dept. Staffs</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

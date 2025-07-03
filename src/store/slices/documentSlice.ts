@@ -1,76 +1,72 @@
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Document, DocumentStatus, DocumentShare, ShareStatus, DocumentVersion, DigitalSignature } from '@/lib/types';
-import { mockDocuments } from '@/lib/mock-data';
+import { MockDocument } from '../../../mock-db/index';
+import { DocumentsAPI, apiCall } from '../../services/api';
 
-// Async thunks for document operations
+// Update async thunks to use the API layer
 export const fetchDocuments = createAsyncThunk(
   'documents/fetchDocuments',
-  async (filters?: { department?: string; status?: DocumentStatus; userId?: string }) => {
-    // Simulate API call with mock data
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filteredDocs = [...mockDocuments];
-    
-    if (filters?.department) {
-      filteredDocs = filteredDocs.filter(doc => doc.department === filters.department);
-    }
-    
-    if (filters?.status) {
-      filteredDocs = filteredDocs.filter(doc => doc.status === filters.status);
-    }
-    
-    if (filters?.userId) {
-      filteredDocs = filteredDocs.filter(doc => 
-        doc.uploadedBy === filters.userId || 
-        doc.assignedTo?.includes(filters.userId) || 
-        doc.currentApprover === filters.userId
-      );
-    }
-    
-    return filteredDocs;
+  async (filters?: { department?: string; status?: string; userId?: string }) => {
+    return apiCall(
+      DocumentsAPI.getDocuments(filters),
+      'Failed to fetch documents'
+    );
+  }
+);
+
+export const fetchDocumentById = createAsyncThunk(
+  'documents/fetchDocumentById',
+  async (documentId: string) => {
+    return apiCall(
+      DocumentsAPI.getDocumentById(documentId),
+      `Failed to fetch document ${documentId}`
+    );
   }
 );
 
 export const updateDocumentStatus = createAsyncThunk(
   'documents/updateStatus',
-  async ({ documentId, status, comment }: { documentId: string; status: DocumentStatus; comment?: string }) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return { documentId, status, comment, timestamp: new Date() };
+  async ({ documentId, status, comment }: { documentId: string; status: string; comment?: string }) => {
+    return apiCall(
+      DocumentsAPI.updateDocumentStatus(documentId, status, comment),
+      'Failed to update document status'
+    );
   }
 );
 
 export const uploadDocument = createAsyncThunk(
   'documents/upload',
-  async (documentData: Partial<Document>) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const newDocument: Document = {
-      id: Date.now().toString(),
-      name: documentData.name || 'Untitled Document',
-      type: documentData.type!,
-      department: documentData.department!,
-      uploadedBy: documentData.uploadedBy!,
-      uploadedAt: new Date(),
-      modifiedAt: new Date(),
-      status: DocumentStatus.DRAFT,
-      fileUrl: documentData.fileUrl || '',
-      fileSize: documentData.fileSize || 0,
-      fileType: documentData.fileType || 'application/pdf',
-      description: documentData.description,
-      tags: documentData.tags || [],
-      priority: documentData.priority || 'medium',
-      version: 1,
-      shares: [],
-      ...documentData
-    };
-    
-    return newDocument;
+  async (documentData: Omit<MockDocument, 'id' | 'uploadedAt' | 'modifiedAt' | 'version'>) => {
+    return apiCall(
+      DocumentsAPI.createDocument(documentData),
+      'Failed to upload document'
+    );
   }
 );
 
+export const updateDocument = createAsyncThunk(
+  'documents/update',
+  async ({ id, updates }: { id: string; updates: Partial<MockDocument> }) => {
+    return apiCall(
+      DocumentsAPI.updateDocument(id, updates),
+      'Failed to update document'
+    );
+  }
+);
+
+export const deleteDocument = createAsyncThunk(
+  'documents/delete',
+  async (documentId: string) => {
+    await apiCall(
+      DocumentsAPI.deleteDocument(documentId),
+      'Failed to delete document'
+    );
+    return documentId;
+  }
+);
+
+// Keep existing thunks for features not yet implemented in API
 export const shareDocument = createAsyncThunk(
   'documents/share',
   async (shareData: Omit<DocumentShare, 'id' | 'sharedAt'>) => {
@@ -180,14 +176,14 @@ export const verifySignature = createAsyncThunk(
 );
 
 interface DocumentState {
-  documents: Document[];
+  documents: MockDocument[];
   shares: DocumentShare[];
   loading: boolean;
   error: string | null;
-  selectedDocument: Document | null;
+  selectedDocument: MockDocument | null;
   filters: {
     department?: string;
-    status?: DocumentStatus;
+    status?: string;
     searchTerm: string;
   };
   uploadProgress: number;
@@ -215,7 +211,7 @@ const documentSlice = createSlice({
   name: 'documents',
   initialState,
   reducers: {
-    setSelectedDocument: (state, action: PayloadAction<Document | null>) => {
+    setSelectedDocument: (state, action: PayloadAction<MockDocument | null>) => {
       state.selectedDocument = action.payload;
     },
     setFilters: (state, action: PayloadAction<Partial<typeof initialState.filters>>) => {
@@ -246,6 +242,19 @@ const documentSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch documents';
       })
+
+    // Fetch document by ID
+    builder
+      .addCase(fetchDocumentById.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.selectedDocument = action.payload;
+          // Update in documents array if exists
+          const index = state.documents.findIndex(d => d.id === action.payload!.id);
+          if (index !== -1) {
+            state.documents[index] = action.payload;
+          }
+        }
+      })
       
     // Update document status
     builder
@@ -255,15 +264,17 @@ const documentSlice = createSlice({
       })
       .addCase(updateDocumentStatus.fulfilled, (state, action) => {
         state.statusUpdateLoading = false;
-        const { documentId, status } = action.payload;
-        const document = state.documents.find(doc => doc.id === documentId);
-        if (document) {
-          document.status = status;
-          document.modifiedAt = new Date();
+        const updatedDocument = action.payload;
+        
+        // Update in documents array
+        const index = state.documents.findIndex(doc => doc.id === updatedDocument.id);
+        if (index !== -1) {
+          state.documents[index] = updatedDocument;
         }
-        if (state.selectedDocument?.id === documentId) {
-          state.selectedDocument.status = status;
-          state.selectedDocument.modifiedAt = new Date();
+        
+        // Update selected document
+        if (state.selectedDocument?.id === updatedDocument.id) {
+          state.selectedDocument = updatedDocument;
         }
       })
       .addCase(updateDocumentStatus.rejected, (state, action) => {
@@ -287,8 +298,31 @@ const documentSlice = createSlice({
         state.error = action.error.message || 'Failed to upload document';
         state.uploadProgress = 0;
       })
+
+    // Update document
+    builder
+      .addCase(updateDocument.fulfilled, (state, action) => {
+        const updatedDocument = action.payload;
+        const index = state.documents.findIndex(d => d.id === updatedDocument.id);
+        if (index !== -1) {
+          state.documents[index] = updatedDocument;
+        }
+        if (state.selectedDocument?.id === updatedDocument.id) {
+          state.selectedDocument = updatedDocument;
+        }
+      })
+
+    // Delete document
+    builder
+      .addCase(deleteDocument.fulfilled, (state, action) => {
+        const documentId = action.payload;
+        state.documents = state.documents.filter(d => d.id !== documentId);
+        if (state.selectedDocument?.id === documentId) {
+          state.selectedDocument = null;
+        }
+      })
       
-    // Share document
+    // Share document (keep existing implementation)
     builder
       .addCase(shareDocument.pending, (state) => {
         state.shareLoading = true;
@@ -298,18 +332,30 @@ const documentSlice = createSlice({
         state.shareLoading = false;
         state.shares.push(action.payload);
         
-        // Add share to the document
+        // Add share to the document if it has shares property
         const document = state.documents.find(doc => doc.id === action.payload.documentId);
         if (document) {
           if (!document.shares) document.shares = [];
-          document.shares.push(action.payload);
+          document.shares.push({
+            id: action.payload.id,
+            documentId: action.payload.documentId,
+            fromUserId: action.payload.fromUserId,
+            toUserId: action.payload.toUserId,
+            toDepartment: action.payload.toDepartment,
+            status: action.payload.status,
+            message: action.payload.message,
+            sharedAt: action.payload.sharedAt.toISOString(),
+            receivedAt: action.payload.receivedAt?.toISOString(),
+            seenAt: action.payload.seenAt?.toISOString(),
+            acknowledgedAt: action.payload.acknowledgedAt?.toISOString()
+          });
         }
       })
       .addCase(shareDocument.rejected, (state, action) => {
         state.shareLoading = false;
         state.error = action.error.message || 'Failed to share document';
-      })
-      
+      });
+
     // Update share status
     builder
       .addCase(updateShareStatus.fulfilled, (state, action) => {
@@ -337,9 +383,20 @@ const documentSlice = createSlice({
         const document = state.documents.find(doc => doc.id === version.documentId);
         if (document) {
           if (!document.versions) document.versions = [];
-          document.versions.push(version);
+          document.versions.push({
+            id: version.id,
+            documentId: version.documentId,
+            version: version.version,
+            name: version.name,
+            content: version.content,
+            modifiedBy: version.modifiedBy,
+            modifiedAt: version.modifiedAt.toISOString(),
+            changeDescription: version.changeDescription,
+            fileUrl: version.fileUrl,
+            fileSize: version.fileSize
+          });
           document.version = version.version;
-          document.modifiedAt = version.modifiedAt;
+          document.modifiedAt = version.modifiedAt.toISOString();
         }
       })
       .addCase(createDocumentVersion.rejected, (state, action) => {
@@ -357,8 +414,8 @@ const documentSlice = createSlice({
           if (version) {
             // Restore document to this version
             document.version = version.version;
-            document.modifiedAt = new Date();
-            if (version.content) {
+            document.modifiedAt = new Date().toISOString();
+            if (version.content && document.formData !== undefined) {
               document.formData = version.content;
             }
           }
@@ -377,29 +434,59 @@ const documentSlice = createSlice({
         const document = state.documents.find(doc => doc.id === documentId);
         if (document) {
           if (!document.signatures) document.signatures = [];
-          document.signatures.push(signature);
+          document.signatures.push({
+            id: signature.id,
+            documentId: signature.documentId,
+            signerId: signature.signerId,
+            signerName: signature.signerName,
+            signerRole: signature.signerRole,
+            signatureData: signature.signatureData,
+            signedAt: signature.signedAt.toISOString(),
+            ipAddress: signature.ipAddress,
+            userAgent: signature.userAgent,
+            signatureType: signature.signatureType,
+            comments: signature.comments,
+            isValid: signature.isValid
+          });
           
           // Update document status based on signature type
           if (signature.signatureType === 'approval') {
             document.status = DocumentStatus.APPROVED;
-            document.isLocked = true; // Lock document after approval
+            if (document.isLocked !== undefined) {
+              document.isLocked = true; // Lock document after approval
+            }
           } else if (signature.signatureType === 'rejection') {
             document.status = DocumentStatus.REJECTED;
           }
           
-          document.modifiedAt = new Date();
+          document.modifiedAt = new Date().toISOString();
         }
         
         if (state.selectedDocument?.id === documentId) {
           if (!state.selectedDocument.signatures) state.selectedDocument.signatures = [];
-          state.selectedDocument.signatures.push(signature);
+          state.selectedDocument.signatures.push({
+            id: signature.id,
+            documentId: signature.documentId,
+            signerId: signature.signerId,
+            signerName: signature.signerName,
+            signerRole: signature.signerRole,
+            signatureData: signature.signatureData,
+            signedAt: signature.signedAt.toISOString(),
+            ipAddress: signature.ipAddress,
+            userAgent: signature.userAgent,
+            signatureType: signature.signatureType,
+            comments: signature.comments,
+            isValid: signature.isValid
+          });
           if (signature.signatureType === 'approval') {
             state.selectedDocument.status = DocumentStatus.APPROVED;
-            state.selectedDocument.isLocked = true;
+            if (state.selectedDocument.isLocked !== undefined) {
+              state.selectedDocument.isLocked = true;
+            }
           } else if (signature.signatureType === 'rejection') {
             state.selectedDocument.status = DocumentStatus.REJECTED;
           }
-          state.selectedDocument.modifiedAt = new Date();
+          state.selectedDocument.modifiedAt = new Date().toISOString();
         }
       })
       .addCase(addDigitalSignature.rejected, (state, action) => {

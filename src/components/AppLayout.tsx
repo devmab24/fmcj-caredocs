@@ -1,22 +1,32 @@
 
-import { ReactNode } from "react";
-import AppSidebar from "./AppSidebar";
-import AppHeader from "./AppHeader";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import React from 'react';
+import AppHeader from './AppHeader';
+import { useAuth } from '@/contexts/AuthContext';
+import { RoleSwitcher } from './RoleSwitcher';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
-const AppLayout = ({ children }: { children: ReactNode }) => {
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
+
+const AppLayout = ({ children }: AppLayoutProps) => {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <SidebarProvider>
-      <div className="min-h-screen w-full flex flex-col">
-        <AppHeader />
-        <div className="flex flex-1 w-full">
-          <AppSidebar />
-          <main className="flex-1 p-6">
-            {children}
-          </main>
+    <TooltipProvider>
+      <SidebarProvider>
+        <div className="min-h-screen bg-background">
+          <AppHeader />
+          <main>{children}</main>
+          <RoleSwitcher />
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 };
 
